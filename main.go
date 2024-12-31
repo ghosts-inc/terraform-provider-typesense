@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Kekenika/terraform-provider-typesense/typesense"
+	"github.com/davecowart/terraform-provider-typesense/typesense"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
 

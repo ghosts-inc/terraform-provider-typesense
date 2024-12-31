@@ -100,8 +100,16 @@ func resourceTypesenseCurationUpsert(ctx context.Context, d *schema.ResourceData
 	if vs := d.Get("rule").([]interface{}); len(vs) > 0 {
 		rule := vs[0].(map[string]interface{})
 
+		// Convert string to api.SearchOverrideRuleMatch
+		var match api.SearchOverrideRuleMatch
+		switch rule["match"].(string) {
+		case "exact":
+			match = api.SearchOverrideRuleMatchExact
+		case "contains":
+			match = api.SearchOverrideRuleMatchContains
+		}
 		overwriteSchema.Rule = api.SearchOverrideRule{
-			Match: rule["match"].(string),
+			Match: match,
 			Query: rule["query"].(string),
 		}
 	}
@@ -123,7 +131,7 @@ func resourceTypesenseCurationUpsert(ctx context.Context, d *schema.ResourceData
 			includes[i] = include
 		}
 
-		overwriteSchema.Includes = includes
+		*overwriteSchema.Includes = includes
 	}
 
 	if vs := d.Get("excludes").([]interface{}); len(vs) > 0 {
@@ -136,7 +144,7 @@ func resourceTypesenseCurationUpsert(ctx context.Context, d *schema.ResourceData
 			}
 		}
 
-		overwriteSchema.Excludes = excludes
+		*overwriteSchema.Excludes = excludes
 	}
 
 	override, err := client.Collection(collectionName).Overrides().Upsert(name, overwriteSchema)
@@ -176,14 +184,14 @@ func resourceTypesenseCurationRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	if len(override.Includes) > 0 {
-		if err := d.Set("includes", flattenCurationIncludes(override.Includes)); err != nil {
+	if len(*override.Includes) > 0 {
+		if err := d.Set("includes", flattenCurationIncludes(*override.Includes)); err != nil {
 			return diag.FromErr(err)
 		}
 	}
 
-	if len(override.Excludes) > 0 {
-		if err := d.Set("excludes", flattenCurationExcludes(override.Excludes)); err != nil {
+	if len(*override.Excludes) > 0 {
+		if err := d.Set("excludes", flattenCurationExcludes(*override.Excludes)); err != nil {
 			return diag.FromErr(err)
 		}
 	}

@@ -62,11 +62,13 @@ func resourceTypesenseCollection() *schema.Resource {
 								"int64",
 								"float",
 								"bool",
+								"object",
 								"string[]",
 								"int32[]",
 								"int64[]",
 								"float[]",
 								"bool[]",
+								"object[]",
 								"geopoint",
 								"auto",
 							}, false),
@@ -81,6 +83,10 @@ func resourceTypesenseCollection() *schema.Resource {
 			},
 			"num_documents": {
 				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"enable_nested_fields": {
+				Type:     schema.TypeBool,
 				Computed: true,
 			},
 		},
@@ -104,7 +110,8 @@ func resourceTypesenseCollectionCreate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if v := d.Get("default_sorting_field"); v != "" {
-		schema.DefaultSortingField = v.(string)
+		field := v.(string)
+		schema.DefaultSortingField = &field
 	}
 
 	fields := []api.Field{}
@@ -117,11 +124,13 @@ func resourceTypesenseCollectionCreate(ctx context.Context, d *schema.ResourceDa
 		}
 
 		if value := v["facet"]; value != "" {
-			field.Facet = value.(bool)
+			facet := value.(bool)
+			field.Facet = &facet
 		}
 
 		if value := v["optional"]; value != "" {
-			field.Optional = value.(bool)
+			optional := value.(bool)
+			field.Optional = &optional
 		}
 
 		if value := v["index"]; value != "" {
@@ -197,7 +206,8 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if v := d.Get("default_sorting_field"); v != "" {
-		schema.DefaultSortingField = v.(string)
+		field := v.(string)
+		schema.DefaultSortingField = &field
 	}
 
 	fields := []api.Field{}
@@ -210,11 +220,13 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 		}
 
 		if value := v["facet"]; value != "" {
-			field.Facet = value.(bool)
+			facet := value.(bool)
+			field.Facet = &facet
 		}
 
 		if value := v["optional"]; value != "" {
-			field.Optional = value.(bool)
+			optional := value.(bool)
+			field.Optional = &optional
 		}
 
 		if value := v["index"]; value != "" {

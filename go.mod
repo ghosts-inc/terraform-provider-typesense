@@ -1,6 +1,6 @@
-module github.com/Kekenika/terraform-provider-typesense
+module github.com/davecowart/terraform-provider-typesense
 
-go 1.17
+go 1.23
 
 require (
 	github.com/hashicorp/terraform-plugin-docs v0.13.0

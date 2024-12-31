@@ -58,6 +58,10 @@ func dataSourceTypesenseCollection() *schema.Resource {
 				Type:     schema.TypeInt,
 				Computed: true,
 			},
+			"enable_nested_fields": {
+				Type:     schema.TypeBool,
+				Computed: true,
+			},
 		},
 		ReadContext: dataSourceTypesenseCollectionRead,
 	}
@@ -89,6 +93,10 @@ func dataSourceTypesenseCollectionRead(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if err := d.Set("num_documents", collection.NumDocuments); err != nil {
+		return diag.FromErr(err)
+	}
+
+	if err := d.Set("enable_nested_fields", collection.EnableNestedFields); err != nil {
 		return diag.FromErr(err)
 	}
 
