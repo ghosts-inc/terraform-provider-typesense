@@ -87,7 +87,8 @@ func resourceTypesenseCollection() *schema.Resource {
 			},
 			"enable_nested_fields": {
 				Type:     schema.TypeBool,
-				Computed: true,
+				ForceNew: true,
+				Optional: true,
 			},
 		},
 		ReadContext:   resourceTypesenseCollectionRead,
@@ -112,6 +113,11 @@ func resourceTypesenseCollectionCreate(ctx context.Context, d *schema.ResourceDa
 	if v := d.Get("default_sorting_field"); v != "" {
 		field := v.(string)
 		schema.DefaultSortingField = &field
+	}
+
+	if v := d.Get("enable_nested_fields"); v != "" {
+		nested := v.(bool)
+		schema.EnableNestedFields = &nested
 	}
 
 	fields := []api.Field{}
@@ -182,6 +188,10 @@ func resourceTypesenseCollectionRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
+	if err := d.Set("enable_nested_fields", collection.EnableNestedFields); err != nil {
+		return diag.FromErr(err)
+	}
+
 	return diags
 }
 
@@ -208,6 +218,11 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 	if v := d.Get("default_sorting_field"); v != "" {
 		field := v.(string)
 		schema.DefaultSortingField = &field
+	}
+
+	if v := d.Get("enable_nested_fields"); v != "" {
+		enabled := v.(bool)
+		schema.EnableNestedFields = &enabled
 	}
 
 	fields := []api.Field{}
