@@ -51,6 +51,13 @@ func resourceTypesenseCollection() *schema.Resource {
 							Computed:    true,
 							Description: "Optional field",
 						},
+						"reference": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Optional:    true,
+							Computed:    true,
+							Description: "Reference field",
+						},
 						"type": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
@@ -137,6 +144,11 @@ func resourceTypesenseCollectionCreate(ctx context.Context, d *schema.ResourceDa
 		if value := v["optional"]; value != "" {
 			optional := value.(bool)
 			field.Optional = &optional
+		}
+
+		if value := v["reference"]; value != "" {
+			reference := value.(string)
+			field.Reference = &reference
 		}
 
 		if value := v["index"]; value != "" {
