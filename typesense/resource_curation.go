@@ -104,9 +104,9 @@ func resourceTypesenseCurationUpsert(ctx context.Context, d *schema.ResourceData
 		var match api.SearchOverrideRuleMatch
 		switch rule["match"].(string) {
 		case "exact":
-			match = api.SearchOverrideRuleMatchExact
+			match = api.Exact
 		case "contains":
-			match = api.SearchOverrideRuleMatchContains
+			match = api.Contains
 		}
 		overwriteSchema.Rule = api.SearchOverrideRule{
 			Match: match,
@@ -147,7 +147,7 @@ func resourceTypesenseCurationUpsert(ctx context.Context, d *schema.ResourceData
 		*overwriteSchema.Excludes = excludes
 	}
 
-	override, err := client.Collection(collectionName).Overrides().Upsert(name, overwriteSchema)
+	override, err := client.Collection(collectionName).Overrides().Upsert(ctx, name, overwriteSchema)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -166,7 +166,7 @@ func resourceTypesenseCurationRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	override, err := client.Collection(collectionName).Override(id).Retrieve()
+	override, err := client.Collection(collectionName).Override(id).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
@@ -209,7 +209,7 @@ func resourceTypesenseCurationDelete(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	_, err = client.Collection(collectionName).Override(id).Delete()
+	_, err = client.Collection(collectionName).Override(id).Delete(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -226,7 +226,7 @@ func resourceTypesenseCurationState(ctx context.Context, d *schema.ResourceData,
 		return nil, err
 	}
 
-	override, err := client.Collection(collectionName).Override(id).Retrieve()
+	override, err := client.Collection(collectionName).Override(id).Retrieve(ctx)
 	if err != nil {
 		return nil, err
 	}

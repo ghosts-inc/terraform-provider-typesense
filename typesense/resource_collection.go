@@ -148,7 +148,7 @@ func resourceTypesenseCollectionCreate(ctx context.Context, d *schema.ResourceDa
 
 	schema.Fields = fields
 
-	collection, err := client.Collections().Create(schema)
+	collection, err := client.Collections().Create(ctx, schema)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -164,7 +164,7 @@ func resourceTypesenseCollectionRead(ctx context.Context, d *schema.ResourceData
 
 	id := d.Id()
 
-	collection, err := client.Collection(id).Retrieve()
+	collection, err := client.Collection(id).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
@@ -202,7 +202,7 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 
 	id := d.Id()
 
-	_, err := client.Collection(id).Delete()
+	_, err := client.Collection(id).Delete(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -253,7 +253,7 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 
 	schema.Fields = fields
 
-	_, err = client.Collections().Create(schema)
+	_, err = client.Collections().Create(ctx, schema)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -268,7 +268,7 @@ func resourceTypesenseCollectionDelete(ctx context.Context, d *schema.ResourceDa
 
 	id := d.Id()
 
-	_, err := client.Collection(id).Delete()
+	_, err := client.Collection(id).Delete(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -63,7 +63,7 @@ func resourceTypesenseSynonymsUpsert(ctx context.Context, d *schema.ResourceData
 		synonymSchema.Root = &root
 	}
 
-	synonym, err := client.Collection(collectionName).Synonyms().Upsert(name, synonymSchema)
+	synonym, err := client.Collection(collectionName).Synonyms().Upsert(ctx, name, synonymSchema)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -82,7 +82,7 @@ func resourceTypesenseSynonymsRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	synonym, err := client.Collection(collectionName).Synonym(id).Retrieve()
+	synonym, err := client.Collection(collectionName).Synonym(id).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
@@ -120,7 +120,7 @@ func resourceTypesenseSynonymsDelete(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	_, err = client.Collection(collectionName).Synonym(id).Delete()
+	_, err = client.Collection(collectionName).Synonym(id).Delete(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -137,7 +137,7 @@ func resourceTypesenseSynonymsState(ctx context.Context, d *schema.ResourceData,
 		return nil, err
 	}
 
-	synonym, err := client.Collection(collectionName).Synonym(id).Retrieve()
+	synonym, err := client.Collection(collectionName).Synonym(id).Retrieve(ctx)
 	if err != nil {
 		return nil, err
 	}

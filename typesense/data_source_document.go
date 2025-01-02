@@ -49,7 +49,7 @@ func dataSourceTypesenseDocumentRead(ctx context.Context, d *schema.ResourceData
 
 	id := fmt.Sprintf("%s.%s", collectionName, docId)
 
-	doc, err := client.Collection(collectionName).Document(docId).Retrieve()
+	doc, err := client.Collection(collectionName).Document(docId).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)

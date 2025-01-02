@@ -60,7 +60,7 @@ func resourceTypesenseDocumentUpsert(ctx context.Context, d *schema.ResourceData
 		return diag.Errorf("id required for document")
 	}
 
-	_, err := client.Collection(collectionName).Documents().Create(document)
+	_, err := client.Collection(collectionName).Documents().Create(ctx, document)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -79,7 +79,7 @@ func resourceTypesenseDocumentRead(ctx context.Context, d *schema.ResourceData, 
 		return diag.FromErr(err)
 	}
 
-	doc, err := client.Collection(collectionName).Document(id).Retrieve()
+	doc, err := client.Collection(collectionName).Document(id).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
@@ -106,7 +106,7 @@ func resourceTypesenseDocumentDelete(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	_, err = client.Collection(collectionName).Document(id).Delete()
+	_, err = client.Collection(collectionName).Document(id).Delete(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -123,7 +123,7 @@ func resourceTypesenseDocumentState(ctx context.Context, d *schema.ResourceData,
 		return nil, err
 	}
 
-	doc, err := client.Collection(collectionName).Document(id).Retrieve()
+	doc, err := client.Collection(collectionName).Document(id).Retrieve(ctx)
 	if err != nil {
 		return nil, err
 	}

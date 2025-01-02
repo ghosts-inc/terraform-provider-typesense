@@ -87,7 +87,7 @@ func dataSourceTypesenseCurationRead(ctx context.Context, d *schema.ResourceData
 	collectionName := d.Get("collection_name").(string)
 	id := fmt.Sprintf("%s.%s", collectionName, name)
 
-	override, err := client.Collection(collectionName).Override(name).Retrieve()
+	override, err := client.Collection(collectionName).Override(name).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)

@@ -72,7 +72,7 @@ func dataSourceTypesenseCollectionRead(ctx context.Context, d *schema.ResourceDa
 
 	var diags diag.Diagnostics
 
-	collection, err := client.Collection(d.Get("name").(string)).Retrieve()
+	collection, err := client.Collection(d.Get("name").(string)).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
