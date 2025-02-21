@@ -87,7 +87,7 @@ func dataSourceTypesenseCurationRead(ctx context.Context, d *schema.ResourceData
 	collectionName := d.Get("collection_name").(string)
 	id := fmt.Sprintf("%s.%s", collectionName, name)
 
-	override, err := client.Collection(collectionName).Override(name).Retrieve()
+	override, err := client.Collection(collectionName).Override(name).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
@@ -105,14 +105,14 @@ func dataSourceTypesenseCurationRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	if len(override.Includes) > 0 {
-		if err := d.Set("includes", flattenCurationIncludes(override.Includes)); err != nil {
+	if len(*override.Includes) > 0 {
+		if err := d.Set("includes", flattenCurationIncludes(*override.Includes)); err != nil {
 			return diag.FromErr(err)
 		}
 	}
 
-	if len(override.Excludes) > 0 {
-		if err := d.Set("excludes", flattenCurationExcludes(override.Excludes)); err != nil {
+	if len(*override.Excludes) > 0 {
+		if err := d.Set("excludes", flattenCurationExcludes(*override.Excludes)); err != nil {
 			return diag.FromErr(err)
 		}
 	}

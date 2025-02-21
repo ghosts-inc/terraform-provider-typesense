@@ -52,7 +52,7 @@ func dataSourceTypesenseSynonymsRead(ctx context.Context, d *schema.ResourceData
 
 	id := fmt.Sprintf("%s.%s", collectionName, name)
 
-	synonym, err := client.Collection(collectionName).Synonym(name).Retrieve()
+	synonym, err := client.Collection(collectionName).Synonym(name).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
@@ -72,7 +72,7 @@ func dataSourceTypesenseSynonymsRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
-	if synonym.Root != "" {
+	if *synonym.Root != "" {
 		if err := d.Set("root", synonym.Root); err != nil {
 			if err := d.Set("root", synonym.Root); err != nil {
 				return diag.FromErr(err)

@@ -34,7 +34,7 @@ func dataSourceTypesenseCollectionAliasRead(ctx context.Context, d *schema.Resou
 
 	id := d.Id()
 
-	alias, err := client.Alias(id).Retrieve()
+	alias, err := client.Alias(id).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)

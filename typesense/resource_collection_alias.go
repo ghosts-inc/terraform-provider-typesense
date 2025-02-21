@@ -43,12 +43,12 @@ func resourceTypesenseCollectionAliasUpsert(ctx context.Context, d *schema.Resou
 		CollectionName: d.Get("collection_name").(string),
 	}
 
-	alias, err := client.Aliases().Upsert(name, aliasSchema)
+	alias, err := client.Aliases().Upsert(ctx, name, aliasSchema)
 	if err != nil {
 		return diag.FromErr(err)
 	}
 
-	d.SetId(alias.Name)
+	d.SetId(*alias.Name)
 	return resourceTypesenseCollectionAliasRead(ctx, d, meta)
 }
 
@@ -59,7 +59,7 @@ func resourceTypesenseCollectionAliasRead(ctx context.Context, d *schema.Resourc
 
 	id := d.Id()
 
-	alias, err := client.Alias(id).Retrieve()
+	alias, err := client.Alias(id).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
@@ -83,7 +83,7 @@ func resourceTypesenseCollectionAliasDelete(ctx context.Context, d *schema.Resou
 
 	id := d.Id()
 
-	_, err := client.Alias(id).Delete()
+	_, err := client.Alias(id).Delete(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}

@@ -51,6 +51,13 @@ func resourceTypesenseCollection() *schema.Resource {
 							Computed:    true,
 							Description: "Optional field",
 						},
+						"reference": {
+							Type:        schema.TypeString,
+							ForceNew:    true,
+							Optional:    true,
+							Computed:    true,
+							Description: "Reference field",
+						},
 						"type": {
 							Type:        schema.TypeString,
 							ForceNew:    true,
@@ -62,11 +69,13 @@ func resourceTypesenseCollection() *schema.Resource {
 								"int64",
 								"float",
 								"bool",
+								"object",
 								"string[]",
 								"int32[]",
 								"int64[]",
 								"float[]",
 								"bool[]",
+								"object[]",
 								"geopoint",
 								"auto",
 							}, false),
@@ -82,6 +91,11 @@ func resourceTypesenseCollection() *schema.Resource {
 			"num_documents": {
 				Type:     schema.TypeInt,
 				Computed: true,
+			},
+			"enable_nested_fields": {
+				Type:     schema.TypeBool,
+				ForceNew: true,
+				Optional: true,
 			},
 		},
 		ReadContext:   resourceTypesenseCollectionRead,
@@ -104,7 +118,13 @@ func resourceTypesenseCollectionCreate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if v := d.Get("default_sorting_field"); v != "" {
-		schema.DefaultSortingField = v.(string)
+		field := v.(string)
+		schema.DefaultSortingField = &field
+	}
+
+	if v := d.Get("enable_nested_fields"); v != "" {
+		nested := v.(bool)
+		schema.EnableNestedFields = &nested
 	}
 
 	fields := []api.Field{}
@@ -117,11 +137,18 @@ func resourceTypesenseCollectionCreate(ctx context.Context, d *schema.ResourceDa
 		}
 
 		if value := v["facet"]; value != "" {
-			field.Facet = value.(bool)
+			facet := value.(bool)
+			field.Facet = &facet
 		}
 
 		if value := v["optional"]; value != "" {
-			field.Optional = value.(bool)
+			optional := value.(bool)
+			field.Optional = &optional
+		}
+
+		if value := v["reference"]; value != "" {
+			reference := value.(string)
+			field.Reference = &reference
 		}
 
 		if value := v["index"]; value != "" {
@@ -133,7 +160,7 @@ func resourceTypesenseCollectionCreate(ctx context.Context, d *schema.ResourceDa
 
 	schema.Fields = fields
 
-	collection, err := client.Collections().Create(schema)
+	collection, err := client.Collections().Create(ctx, schema)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -149,7 +176,7 @@ func resourceTypesenseCollectionRead(ctx context.Context, d *schema.ResourceData
 
 	id := d.Id()
 
-	collection, err := client.Collection(id).Retrieve()
+	collection, err := client.Collection(id).Retrieve(ctx)
 	if err != nil {
 		d.SetId("")
 		return diag.FromErr(err)
@@ -173,6 +200,10 @@ func resourceTypesenseCollectionRead(ctx context.Context, d *schema.ResourceData
 		return diag.FromErr(err)
 	}
 
+	if err := d.Set("enable_nested_fields", collection.EnableNestedFields); err != nil {
+		return diag.FromErr(err)
+	}
+
 	return diags
 }
 
@@ -183,7 +214,7 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 
 	id := d.Id()
 
-	_, err := client.Collection(id).Delete()
+	_, err := client.Collection(id).Delete(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -197,7 +228,13 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 	}
 
 	if v := d.Get("default_sorting_field"); v != "" {
-		schema.DefaultSortingField = v.(string)
+		field := v.(string)
+		schema.DefaultSortingField = &field
+	}
+
+	if v := d.Get("enable_nested_fields"); v != "" {
+		enabled := v.(bool)
+		schema.EnableNestedFields = &enabled
 	}
 
 	fields := []api.Field{}
@@ -210,11 +247,13 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 		}
 
 		if value := v["facet"]; value != "" {
-			field.Facet = value.(bool)
+			facet := value.(bool)
+			field.Facet = &facet
 		}
 
 		if value := v["optional"]; value != "" {
-			field.Optional = value.(bool)
+			optional := value.(bool)
+			field.Optional = &optional
 		}
 
 		if value := v["index"]; value != "" {
@@ -226,7 +265,7 @@ func resourceTypesenseCollectionUpdate(ctx context.Context, d *schema.ResourceDa
 
 	schema.Fields = fields
 
-	_, err = client.Collections().Create(schema)
+	_, err = client.Collections().Create(ctx, schema)
 	if err != nil {
 		return diag.FromErr(err)
 	}
@@ -241,7 +280,7 @@ func resourceTypesenseCollectionDelete(ctx context.Context, d *schema.ResourceDa
 
 	id := d.Id()
 
-	_, err := client.Collection(id).Delete()
+	_, err := client.Collection(id).Delete(ctx)
 	if err != nil {
 		return diag.FromErr(err)
 	}
